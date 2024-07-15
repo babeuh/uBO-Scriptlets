@@ -222,7 +222,7 @@ function callFunction(
 				setTimeout(window[funcCall], funcDelay);
 			} catch { }
 	      };	      
-	      runAt(( ) => { funcInvoke(); }, 'interactive');
+	      runAt(( ) => { funcInvoke(); }, 'complete');
 }
 
 /// no-alert-if.js
