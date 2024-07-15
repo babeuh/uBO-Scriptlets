@@ -219,10 +219,10 @@ function callFunction(
 	      if ( funcCall === '' || funcDelay === '' ) { return; }
 	      const funcInvoke = ( ) => { 
 			try { 
-				setTimeout(window[funcCall], funcDelay);
+				setTimeout(funcCall, funcDelay);
 			} catch { }
 	      };	      
-	      runAt(( ) => { funcInvoke(); }, 'complete');
+	      runAt(( ) => { funcInvoke(); }, 'idle');
 }
 
 /// no-alert-if.js
