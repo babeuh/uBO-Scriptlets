@@ -211,7 +211,6 @@ function appendElem(
 /// callfunction.js
 /// alias cf.js
 /// dependency run-at.fn
-/// world ISOLATED
 // example.com##+js(cf, funcName, funcDelay)
 function callFunction(
 	funcCall = '',
