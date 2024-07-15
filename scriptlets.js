@@ -211,15 +211,14 @@ function appendElem(
 /// callfunction.js
 /// alias cf.js
 /// dependency run-at.fn
-// example.com##+js(cf, funcName, funcDelay)
+// example.com##+js(cf, funcName)
 function callFunction(
-	funcCall = '',
-	funcDelay = '' 
+	funcCall = ''
 ) {
-	      if ( funcCall === '' || funcDelay === '' ) { return; }
+	      if ( funcCall === '' ) { return; }
 	      const funcInvoke = ( ) => { 
 			try { 
-				setTimeout(funcCall, funcDelay);
+				self.requestAnimationFrame(funcCall)
 			} catch { }
 	      };	      
 	      runAt(( ) => { funcInvoke(); }, 'idle');
