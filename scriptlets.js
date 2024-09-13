@@ -1,7 +1,8 @@
 'use strict';
 
 /// remove-node.js
-/// alias rn.js
+/// world ISOLATED
+/// alias rmn.js
 /// dependency run-at.fn
 /// dependency safe-self.fn
 function removeNode(
