@@ -1,5 +1,59 @@
 'use strict';
 
+/// remove-node.js
+/// alias rn.js
+/// dependency run-at.fn
+/// dependency safe-self.fn
+function removeNode(
+	element = '',
+	needle = '',
+	run = ''
+) {	
+          if ( element === '' || needle === '' ) { return; }
+	  const safe = safeSelf();
+	  const reNeedle = safe.patternToRegex(needle);
+	  let timer;
+	  const remnode = () => {
+                        timer = undefined;
+		        try {
+				const nodes = document.querySelectorAll(element);
+				if ( nodes.length > 0 ) {
+					for (const node of nodes) {
+						if (reNeedle.test(node.outerHTML)) {
+						    node.remove(); 
+					       }     
+					}
+				}	
+			} catch { }
+          };
+	  const mutationHandler = mutations => {
+		if ( timer !== undefined ) { return; }
+		let skip = true;
+		for ( let i = 0; i < mutations.length && skip; i++ ) {
+		    const { type, addedNodes, removedNodes } = mutations[i];
+		    if ( type === 'attributes' ) { skip = false; }
+		    for ( let j = 0; j < addedNodes.length && skip; j++ ) {
+			if ( addedNodes[j].nodeType === 1 ) { skip = false; break; }
+		    }
+		    for ( let j = 0; j < removedNodes.length && skip; j++ ) {
+			if ( removedNodes[j].nodeType === 1 ) { skip = false; break; }
+		    }
+		}
+		if ( skip ) { return; }
+		timer = self.requestAnimationFrame(remnode);
+	  };
+	  const start = ( ) => {
+		remnode();
+		if ( /\bloop\b/.test(run) === false ) { return; }
+		const observer = new MutationObserver(mutationHandler);
+		observer.observe(document.documentElement, {
+		    childList: true,
+		    subtree: true,
+		});
+	  };
+	  runAt(( ) => { start(); }, /\bcomplete\b/.test(run) ? 'idle' : 'interactive');
+}
+
 /// rename-attr.js
 /// alias rna.js
 /// world ISOLATED
