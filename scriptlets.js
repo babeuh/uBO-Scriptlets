@@ -10,23 +10,23 @@ function removeNode(
 	needle = '',
 	run = ''
 ) {	
-          if ( element === '' || needle === '' ) { return; }
+	  if ( element === '' || needle === '' ) { return; }
 	  const safe = safeSelf();
 	  const reNeedle = safe.patternToRegex(needle);
 	  let timer;
 	  const remnode = () => {
-                        timer = undefined;
+				timer = undefined;
 		        try {
 				const nodes = document.querySelectorAll(element);
 				if ( nodes.length > 0 ) {
 					for (const node of nodes) {
 						if (reNeedle.test(node.outerHTML)) {
 						    node.remove(); 
-					       }     
+					   }     
 					}
 				}	
-			} catch { }
-          };
+			    } catch { }
+      };
 	  const mutationHandler = mutations => {
 		if ( timer !== undefined ) { return; }
 		let skip = true;
