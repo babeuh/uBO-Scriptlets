@@ -279,46 +279,6 @@ function callFunction(
 	      runAt(( ) => { funcInvoke(); }, 'idle');
 }
 
-/// no-alert-if.js
-/// alias noaif.js
-// example.com##+js(noaif, text)
-function noAlertIf(
-        needle = ''
-) {
-                const needleNot = needle.charAt(0) === '!';
-                if ( needleNot ) { needle = needle.slice(1); }
-                if ( /^\/.*\/$/.test(needle) ) {
-                    needle = needle.slice(1, -1);
-                } else if ( needle !== '' ) {
-                    needle = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                }
-                const log = needleNot === false && needle.length === 0 ? console.log.bind(console) : undefined;
-                const reNeedle = new RegExp(needle);
-                self.alert = new Proxy(self.alert, {
-                        apply: (target, thisArg, args) => {
-		            let params;
-			    try {
-                            	  params = String(args);
-			    } catch { }	    
-                            let defuse = false;
-                            if ( log !== undefined ) {
-                                 log('uBO: alert("%s")', params);
-                            } else if ( reNeedle.test(params) !== needleNot ) {
-                                 defuse = reNeedle.test(params) !== needleNot;
-                            }
-                            if ( !defuse ) {
-                                 return Reflect.apply(target, thisArg, args);
-                            }  
-                        },
-			get: (target, prop, receiver) => {
-                	    if ( prop === 'toString' ) {
-                    		 return target.toString.bind(target);
-                	}
-                		return Reflect.get(target, prop, receiver);
-            		},
-                });
-}
-
 /// insert-child-before.js
 /// alias icb.js
 /// world ISOLATED
