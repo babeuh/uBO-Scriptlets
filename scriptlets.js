@@ -529,7 +529,6 @@ function setAttr(
 			for ( const attr of tokens ) {
 			      if ( attr !== attrValue) { 
 				   node.setAttribute(attr, attrValue);
-				   break;   
 			      }	      
 			}
 		}
@@ -557,7 +556,7 @@ function setAttr(
 	const observer = new MutationObserver(mutationHandler);
 	observer.observe(document.documentElement, {
 	    attributes: true,
-	    attributeFilter: attr,
+	    attributeFilter: tokens,
 	    childList: true,
 	    subtree: true,
 	});
