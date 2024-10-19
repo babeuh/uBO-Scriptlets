@@ -463,49 +463,6 @@ function moveAttrProp(
 	runAt(( ) => { map(); }, 'interactive');
 }
 
-/// no-beacon.js
-/// alias nob.js
-/// dependency run-at.fn
-/// dependency safe-self.fn
-function noBeaconIf(
-        url = '',
-        data = ''
-) {
-        const safe = safeSelf();
-        const extraArgs = safe.getExtraArgs(Array.from(arguments), 2);
-        const reUrl = safe.patternToRegex(url);
-        const reData = safe.patternToRegex(data);
-	const log = url.length === 0 && data.length === 0 ? console.log.bind(console) : undefined;
-        const trapBeacons = ( ) => {
-           const beaconHandler = {
-                apply: (target, thisArg, args) => {
-                    let url, data;
-                    try {
-                          url = String(args[0]);
-                          data = String(args[1]);
-                    } catch { }	    
-                    const matchesNeedle = safe.RegExp_test.call(reUrl, url);
-                    const matchesData = safe.RegExp_test.call(reData, data);
-                    const matchesEither = matchesNeedle || matchesData;
-                    const matchesBoth = matchesNeedle && matchesData;
-                    if ( log !== undefined ) {
-                        log(`sendBeacon('${url}', '${data}')`);
-                    }
-                    if ( matchesBoth ) { return; }
-                    return Reflect.apply(target, thisArg, args);
-                },
-                get: (target, prop, receiver) => {
-                    if ( prop === 'toString' ) {
-                        return target.toString.bind(target);
-                    }
-                        return Reflect.get(target, prop, receiver);
-                },
-            };
-           self.navigator.sendBeacon = new Proxy(self.navigator.sendBeacon, beaconHandler);
-        };
-        runAt(( ) => { trapBeacons(); }, extraArgs.runAt);
-}
-
 /// trusted-set-attr.js
 /// alias tsa.js
 /// dependency run-at.fn
