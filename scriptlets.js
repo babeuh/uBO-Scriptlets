@@ -557,7 +557,7 @@ function setAttr(
 	const observer = new MutationObserver(mutationHandler);
 	observer.observe(document.documentElement, {
 	    attributes: true,
-	    attributeFilter: token,
+	    attributeFilter: attr,
 	    childList: true,
 	    subtree: true,
 	});
