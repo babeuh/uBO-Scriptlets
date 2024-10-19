@@ -556,8 +556,6 @@ function setAttr(
 	if ( /\bloop\b/.test(run) === false ) { return; }
 	const observer = new MutationObserver(mutationHandler);
 	observer.observe(document.documentElement, {
-	    attributes: true,
-	    attributeFilter: tokens,
 	    childList: true,
 	    subtree: true,
 	});
