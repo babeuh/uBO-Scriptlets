@@ -117,13 +117,10 @@ function replaceAttr(
 	selector = '',
 	oldattr = '',
 	newattr = '',
-	value = '',
-	run = '' 
+	value = '' 
 ) {
 	if ( selector === '' || oldattr === '' || newattr === '' ) { return; }
-	let timer;
 	const replaceattr = ( ) => {
-		timer = undefined;
 		const elems = document.querySelectorAll(selector);
 		try {
 			for ( const elem of elems ) {
@@ -134,32 +131,34 @@ function replaceAttr(
 			}	
 		} catch { }
 	};
-	const mutationHandler = mutations => {
-		if ( timer !== undefined ) { return; }
-		let skip = true;
-		for ( let i = 0; i < mutations.length && skip; i++ ) {
-		    const { type, addedNodes, removedNodes } = mutations[i];
-		    if ( type === 'attributes' ) { skip = false; }
-		    for ( let j = 0; j < addedNodes.length && skip; j++ ) {
-			if ( addedNodes[j].nodeType === 1 ) { skip = false; break; }
-		    }
-		    for ( let j = 0; j < removedNodes.length && skip; j++ ) {
-			if ( removedNodes[j].nodeType === 1 ) { skip = false; break; }
-		    }
-		}
-		if ( skip ) { return; }
-		timer = self.requestAnimationFrame(replaceattr);
-	};
-	const start = ( ) => {
-		replaceattr();
-		if ( /\bloop\b/.test(run) === false ) { return; }
-		const observer = new MutationObserver(mutationHandler);
-		observer.observe(document.documentElement, {
-		    childList: true,
-		    subtree: true,
-		});
-	};
-	runAt(( ) => { start(); }, /\bcomplete\b/.test(run) ? 'idle' : 'interactive');
+	let observer, timer;
+    	const onDomChanged = mutations => {
+        if ( timer !== undefined ) { return; }
+        let shouldWork = false;
+        for ( const mutation of mutations ) {
+            if ( mutation.addedNodes.length === 0 ) { continue; }
+            for ( const node of mutation.addedNodes ) {
+                if ( node.nodeType !== 1 ) { continue; }
+                shouldWork = true;
+                break;
+            }
+            if ( shouldWork ) { break; }
+        }
+        if ( shouldWork === false ) { return; }
+        timer = self.requestAnimationFrame(( ) => {
+            timer = undefined;
+            replaceattr();
+        });
+        };
+        const start = ( ) => {
+        if ( replaceattr() === false ) { return; }
+        observer = new MutationObserver(onDomChanged);
+        observer.observe(document.body, {
+            subtree: true,
+            childList: true,
+        });
+        };
+        runAt(( ) => { start(); }, 'interactive');
 }
 
 /// add-class.js
