@@ -177,11 +177,40 @@ function addClass(
 		const nodes = document.querySelectorAll(selector);
 		try {
 			for ( const node of nodes ) {
-			      node.classList.add(...needles);
+			      if ( !node.classList.contains(...needles) ) { 
+			           node.classList.add(...needles);
+			      }	
 			}
 		} catch { }
 	};
-	runAt(( ) => { addclass(); }, 'interactive');
+	let observer, timer;
+    	const onDomChanged = mutations => {
+        if ( timer !== undefined ) { return; }
+        let shouldWork = false;
+        for ( const mutation of mutations ) {
+            if ( mutation.addedNodes.length === 0 ) { continue; }
+            for ( const node of mutation.addedNodes ) {
+                if ( node.nodeType !== 1 ) { continue; }
+                shouldWork = true;
+                break;
+            }
+            if ( shouldWork ) { break; }
+        }
+        if ( shouldWork === false ) { return; }
+        timer = self.requestAnimationFrame(( ) => {
+            timer = undefined;
+            addclass();
+        });
+        };
+        const start = ( ) => {
+        if ( addclass() === false ) { return; }
+        observer = new MutationObserver(onDomChanged);
+        observer.observe(document.body, {
+            subtree: true,
+            childList: true,
+        });
+        };
+        runAt(( ) => { start(); }, 'interactive');
 }
 
 /// replace-class.js
