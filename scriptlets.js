@@ -7,15 +7,12 @@
 /// dependency safe-self.fn
 function removeNode(
 	element = '',
-	needle = '',
-	run = ''
+	needle = ''
 ) {	
 	  if ( element === '' || needle === '' ) { return; }
 	  const safe = safeSelf();
 	  const reNeedle = safe.patternToRegex(needle);
-	  let timer;
-	  const remnode = () => {
-				timer = undefined;
+	  const removenode = () => {
 		        try {
 				const nodes = document.querySelectorAll(element);
 				if ( nodes.length > 0 ) {
@@ -25,34 +22,36 @@ function removeNode(
 					   }     
 					}
 				}	
-			    } catch { }
-      };
-	  const mutationHandler = mutations => {
-		if ( timer !== undefined ) { return; }
-		let skip = true;
-		for ( let i = 0; i < mutations.length && skip; i++ ) {
-		    const { type, addedNodes, removedNodes } = mutations[i];
-		    if ( type === 'attributes' ) { skip = false; }
-		    for ( let j = 0; j < addedNodes.length && skip; j++ ) {
-			if ( addedNodes[j].nodeType === 1 ) { skip = false; break; }
-		    }
-		    for ( let j = 0; j < removedNodes.length && skip; j++ ) {
-			if ( removedNodes[j].nodeType === 1 ) { skip = false; break; }
-		    }
-		}
-		if ( skip ) { return; }
-		timer = self.requestAnimationFrame(remnode);
-	  };
-	  const start = ( ) => {
-		remnode();
-		if ( /\bloop\b/.test(run) === false ) { return; }
-		const observer = new MutationObserver(mutationHandler);
-		observer.observe(document.documentElement, {
-		    childList: true,
-		    subtree: true,
-		});
-	  };
-	  runAt(( ) => { start(); }, /\bcomplete\b/.test(run) ? 'idle' : 'interactive');
+			} catch { }
+          };
+	  let observer, timer;
+    	  const onDomChanged = mutations => {
+          if ( timer !== undefined ) { return; }
+          let shouldWork = false;
+          for ( const mutation of mutations ) {
+            if ( mutation.addedNodes.length === 0 ) { continue; }
+            for ( const node of mutation.addedNodes ) {
+                if ( node.nodeType !== 1 ) { continue; }
+                shouldWork = true;
+                break;
+            }
+            if ( shouldWork ) { break; }
+          }
+          if ( shouldWork === false ) { return; }
+          timer = self.requestAnimationFrame(( ) => {
+            timer = undefined;
+            removenode();
+          });
+          };
+          const start = ( ) => {
+          if ( removenode() === false ) { return; }
+          observer = new MutationObserver(onDomChanged);
+          observer.observe(document.body, {
+            subtree: true,
+            childList: true,
+          });
+          };
+          runAt(( ) => { start(); }, 'interactive');
 }
 
 /// rename-attr.js
