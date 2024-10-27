@@ -18,7 +18,7 @@ function removeNode(
 				if ( nodes.length > 0 ) {
 					for (const node of nodes) {
 						if (reNeedle.test(node.outerHTML)) {
-						    node.remove(); 
+						    node.replaceChildren(); 
 					   }     
 					}
 				}	
