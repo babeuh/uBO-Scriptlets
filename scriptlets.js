@@ -9,7 +9,7 @@ function removeNode(
 	element = '',
 	needle = ''
 ) {	
-	  if ( element === '' || needle === '' ) { return; }
+	  if ( element === '') { return; }
 	  const safe = safeSelf();
 	  const reNeedle = safe.patternToRegex(needle);
 	  const removenode = () => {
