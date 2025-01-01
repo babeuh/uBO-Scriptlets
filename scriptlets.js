@@ -447,3 +447,31 @@ function moveAttrProp(
 	};
 	runAt(( ) => { map(); }, 'interactive');
 }
+
+/// replace-with-alt-text.js
+/// alias rwat.js
+/// dependency run-at.fn
+/// world ISOLATED
+function replaceWithAltText(
+         alt = '',
+	 parent = false,
+) {
+    if (alt === '') { return; }
+    const replace = () => {
+    	const replaceImages = () => {
+        	document.querySelectorAll(`img[alt='${alt}']`).forEach((n) => {
+           		if (parent && n.parentElement) {
+				n.parentElement.outerHTML = alt;
+			} else if (!parent) {
+				n.outerHTML = alt;
+			}
+        	});
+	};
+
+    	window.addEventListener("load", replaceImages);
+
+    	const observer = new MutationObserver(replaceImages);
+    	observer.observe(document.body, { childList: true, subtree: true });
+    };
+    runAt(() => { replace(); }, 'interactive');
+}
